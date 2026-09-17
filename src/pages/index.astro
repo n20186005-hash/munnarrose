@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getWeather, describeCode, buildAdvice, windLevelLabel, uvIndexLabel } from '../lib/weather';
 
 const imageSources = {
   hero: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Flora_at_Munnar_Rose_Gardens_11.jpg',
@@ -98,7 +99,7 @@ const faq = [
   ['കുട്ടികളോടൊപ്പം വരാൻ പറ്റുമോ?', 'അതെ. എന്നാൽ തോട്ടം കുന്നിൻ ചെരിവിലായി ടെറസുകളായി ക്രമീകരിച്ചിരിക്കുന്നതിനാൽ ചില ഭാഗങ്ങളിൽ പടികളും ചരിവുകളും ഉണ്ടാകാം.'],
   ['പാർക്കിംഗ് ലഭ്യമാണോ?', 'റോഡ്‌സൈഡ്/പ്രാദേശിക പാർക്കിംഗ് സാധാരണ ലഭ്യമാണെന്ന് പ്രാദേശിക ഗൈഡ് സ്രോതസ്സുകൾ പറയുന്നു. തിരക്കേറിയ സമയങ്ങളിൽ സ്ഥലം പരിമിതമായേക്കാം.'],
   ['മഴക്കാലത്ത് സന്ദർശിക്കാമോ?', 'സന്ദർശിക്കാം, പക്ഷേ പാതകൾ നനഞ്ഞിരിക്കാം. ഗ്രിപ്പ് ഉള്ള ചെരുപ്പും ലളിതമായ മഴക്കോടും ഉപകാരപ്പെടും.'],
-  [`Where is ${entity.fullName} located?`, `${entity.fullName} is located on ${entity.streetAddress}, ${entity.city}, ${entity.state} ${entity.postalCode}, ${entity.country}, on the Munnar–Mattupetty road (plus code ${'33PG+C6 Munnar'}).`],
+  [`Where is ${entity.fullName} located?`, `${entity.fullName} is located on ${entity.streetAddress}, ${entity.city}, ${entity.state} ${entity.postalCode}, ${entity.country}, on the Munnar–Mattupetty road (plus code 33PG+C6 Munnar).`],
   [`What are the opening hours of ${entity.fullName}?`, `Google Maps currently lists ${entity.fullName} as open daily from 08:00 to 18:00. Hours can change with season and weather, so re-check before you travel.`],
   [`Is ${entity.shortName} free to visit?`, `No. ${entity.fullName} charges a small entry fee; recent traveller reports mention around ₹50 per person, with possible extra camera charges. Confirm the current rate at the ticket counter.`],
   [`How do I reach ${entity.fullName} from Munnar town?`, `Take the Mattupetty / Top Station road out of central Munnar by taxi, auto-rickshaw or private vehicle. The garden sits roadside at Rose Nagar, roughly 3 km from Munnar town towards ${entity.nearby1}.`],
@@ -110,6 +111,18 @@ const faqJsonLd = {
   '@type': 'FAQPage',
   mainEntity: faq.map(([q,a]) => ({ '@type':'Question', name:q, acceptedAnswer:{ '@type':'Answer', text:a } }))
 };
+
+// 服务端实时渲染：天气在 Cloudflare Worker 内于请求时获取并缓存。
+export const prerender = false;
+const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+function weekday(d: string): string {
+  return weekdays[new Date(d + 'T00:00:00Z').getUTCDay()];
+}
+const weather = await getWeather(entity.latitude, entity.longitude);
+const advice = weather ? buildAdvice(weather) : null;
+const nowDesc = weather
+  ? `${describeCode(weather.now.code).icon} ${describeCode(weather.now.code).ml} ${Math.round(weather.days[0].tMin)}–${Math.round(weather.days[0].tMax)}℃ · 紫外线${uvIndexLabel(weather.days[0].uvMax)} · ${windLevelLabel(weather.now.windSpeed)}`
+  : '';
 ---
 <BaseLayout
   title={`${entity.fullName} (${entity.city}) - Visitor Guide & Location | മുന്നാർ റോസ് ഗാർഡൻ`}
@@ -173,6 +186,92 @@ const faqJsonLd = {
       </div>
     </section>
 
+    <section class="section bg-[#eef5ec]" id="weather">
+      <div class="wrap">
+        <p class="eyebrow">തത്സമയ കാലാവസ്ഥ</p>
+        <h2 class="section-title mt-2">实时天气与未来预报 · Weather &amp; Forecast</h2>
+        {weather ? (
+          <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_1.7fr]">
+            <div class="card p-6 md:p-8 flex flex-col justify-center">
+              <div class="flex items-center gap-4">
+                <span class="text-6xl leading-none">{describeCode(weather.now.code).icon}</span>
+                <div>
+                  <strong class="text-5xl font-extrabold leading-none text-[color:var(--ink)]">{Math.round(weather.now.temperature)}°</strong>
+                  <p class="mt-1 text-lg font-semibold">{describeCode(weather.now.code).ml}</p>
+                </div>
+              </div>
+              <p class="mt-4 text-sm font-medium text-[color:var(--ink)]">{nowDesc}</p>
+              <dl class="mt-5 grid grid-cols-2 gap-3 text-sm">
+                <div><dt class="muted">体感 / അനുഭവം</dt><dd class="font-bold">{Math.round(weather.now.apparent)}°C</dd></div>
+                <div><dt class="muted">湿度 / ഈർപ്പം</dt><dd class="font-bold">{weather.now.humidity}%</dd></div>
+                <div><dt class="muted">风力 / കാറ്റ്</dt><dd class="font-bold">{windLevelLabel(weather.now.windSpeed)}（{Math.round(weather.now.windSpeed)} km/h）</dd></div>
+                <div><dt class="muted">降水概率 / മഴ സാധ്യത</dt><dd class="font-bold">{weather.days[0].precipProb}%</dd></div>
+              </dl>
+              <p class="mt-5 text-xs source-note">更新于 {weather.now.time.slice(11, 16)}（IST）· 预报仅供参考，出行请以最新天气为准。</p>
+            </div>
+
+            <div class="card p-6 md:p-8">
+              <h3 class="font-bold text-[color:var(--ink)]">出行建议 · Smart Tips</h3>
+
+              {advice && advice.risk.length > 0 && (
+                <div class="mt-4 rounded-2xl border border-[#e23b3b] bg-[#fdecec] p-4">
+                  <p class="text-sm font-bold text-[#c01b1b]">⚠️ 风险提醒</p>
+                  <ul class="mt-2 space-y-1 text-sm leading-7 text-[#9b1414] list-disc pl-5">
+                    {advice.risk.map((r) => <li>{r}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {advice && (advice.travel.length || advice.play.length || advice.items.length) ? (
+                <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                  {advice.travel.length > 0 && (
+                    <div>
+                      <p class="text-xs font-bold text-[#2f7fb0]">🧥 出行穿搭</p>
+                      <ul class="mt-2 space-y-1 text-sm leading-7 muted list-disc pl-5">{advice.travel.map((t) => <li>{t}</li>)}</ul>
+                    </div>
+                  )}
+                  {advice.play.length > 0 && (
+                    <div>
+                      <p class="text-xs font-bold text-[#2f7fb0]">🗺️ 游玩安排</p>
+                      <ul class="mt-2 space-y-1 text-sm leading-7 muted list-disc pl-5">{advice.play.map((p) => <li>{p}</li>)}</ul>
+                    </div>
+                  )}
+                  {advice.items.length > 0 && (
+                    <div>
+                      <p class="text-xs font-bold text-[#2f7fb0]">🎒 随身物品</p>
+                      <ul class="mt-2 space-y-1 text-sm leading-7 muted list-disc pl-5">{advice.items.map((i) => <li>{i}</li>)}</ul>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p class="mt-4 text-sm leading-7 muted">天气平稳，按计划出行即可；山区天气多变，出行前请留意临近预报。</p>
+              )}
+
+              <div class="mt-6 border-t border-[#e3ebdf] pt-4">
+                <h4 class="text-sm font-bold text-[color:var(--ink)]">未来 7 天预报 / 7-Day Forecast</h4>
+                <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+                  {weather.days.map((d, i) => (
+                    <div class="rounded-2xl border border-[#e3ebdf] bg-white/70 p-3 text-center">
+                      <p class="text-xs font-bold">{i === 0 ? '今天' : weekday(d.date)}</p>
+                      <p class="text-[.7rem] muted">{d.date.slice(5)}</p>
+                      <p class="my-1 text-2xl leading-none">{describeCode(d.code).icon}</p>
+                      <p class="text-xs leading-5">{describeCode(d.code).ml}</p>
+                      <p class="mt-1 text-sm font-bold">{Math.round(d.tMax)}°</p>
+                      <p class="text-xs muted">{Math.round(d.tMin)}°</p>
+                      <p class="mt-1 text-[.7rem] text-[#2f7fb0]">💧{d.precipProb}%</p>
+                    </div>
+                  ))}
+                </div>
+                <p class="mt-3 text-sm leading-7 muted">逐日气温为 Munnar（海拔约 1,600 m）的常态区间，山区天气多变，请结合实时数据安排行程。</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p class="mt-6 card p-6 text-sm leading-7 muted">天气数据暂时无法获取，请稍后刷新。出行前建议查询 Munnar 当地天气预报。</p>
+        )}
+      </div>
+    </section>
+
     <section class="section bg-[#f6f2ea]" id="history">
       <div class="wrap grid gap-10 lg:grid-cols-[1.05fr_1.35fr]">
         <div>
@@ -180,6 +279,7 @@ const faqJsonLd = {
           <h2 class="section-title mt-2">History &amp; Significance of {entity.fullName}</h2>
           <p class="mt-5 leading-8 muted">Local tourism listings describe {entity.fullName} as a floriculture centre developed along the {entity.city}–Mattupetty corridor, roadside at Rose Nagar on the Munnar - Aluva Rd. Its beds are cut into the hillside, so the garden reads as a set of green steps above the road rather than a flat municipal park.</p>
           <p class="mt-4 leading-8 muted">ചായത്തോട്ടങ്ങൾക്കും മാട്ടുപ്പെട്ടി റൂട്ടിനും ഇടയിലുള്ള ചെറിയ ഇടവേളയായാണ് കൂടുതൽ യാത്രക്കാരും ഈ പൂന്തോട്ടം ഉപയോഗിക്കുന്നത്; കുന്നിൻ ചെരിവിനനുസരിച്ചുള്ള പടിനില ക്രമീകരണം മുന്നാറിന്റെ ഭൂപ്രകൃതിയോട് ചേർന്നുനിൽക്കുന്നു.</p>
+          <p class="mt-4 leading-8 muted">“Munnar” 出自马拉雅拉姆语，意为“三条河”（Mudhirapuzha、Nallathanni、Kundaly 三河交汇于此）。19 世纪末，英国种植园体系在此开辟大片茶园，Kannan Devan 等茶园延续至今，使 Munnar 成为印度南部著名的红茶之乡；玫瑰园则是当地从单一茶园经济走向花卉展示与自然观光的一处缩影。</p>
           <p class="mt-4 text-sm leading-7 muted">Geographic hierarchy: <strong>{entity.fullName}</strong> → {entity.city} → {entity.state} → {entity.country}. See the current listing on <a class="text-[#b52e5f] underline underline-offset-2" href={entity.mapsShareUrl} target="_blank" rel="noopener noreferrer">Google Maps ↗</a>.</p>
         </div>
         <div class="card p-6 md:p-8">
@@ -212,8 +312,18 @@ const faqJsonLd = {
     <section class="section">
       <div class="wrap grid gap-10 lg:grid-cols-2">
         <div>
-          <p class="eyebrow">വിശദമായ യാത്രാമാർഗം</p><h2 class="section-title mt-2">Location &amp; How to Visit {entity.shortName} in {entity.city}<span class="mt-2 block text-xl font-semibold tracking-normal muted">മുന്നാർ പട്ടണത്തിൽ നിന്ന്</span></h2>
-          <div class="route mt-7">
+          <p class="eyebrow">വിശദമായ യാത്രാമാർഗം</p><h2 class="section-title mt-2">Location &amp; How to Visit {entity.shortName} in {entity.city}</h2>
+          <p class="mt-2 text-xl font-semibold muted">മുന്നാർ പട്ടണത്തിൽ നിന്ന്</p>
+
+          <div class="mt-7 grid gap-3 sm:grid-cols-2">
+            <div class="card p-4"><h3 class="font-bold">✈️ 飞机 / By Air</h3><p class="mt-2 text-sm leading-7 muted">最近机场为科钦国际机场（COK, Kochi），距 Munnar 约 110 km，车程约 3.5–4 小时；南面亦可经马杜赖机场（IXM, Tamil Nadu）约 160 km 入境。落地后转乘出租车或巴士上山。</p></div>
+            <div class="card p-4"><h3 class="font-bold">🚆 火车 / By Train</h3><p class="mt-2 text-sm leading-7 muted">最近的铁路枢纽为 Aluva（AWY，约 110 km）与 Ernakulam（ERS，约 130 km）；泰米尔纳德方向可经 Theni / Bodinayakkanur。到站后转公路前往 Munnar。</p></div>
+            <div class="card p-4"><h3 class="font-bold">🚌 巴士 / By Bus</h3><p class="mt-2 text-sm leading-7 muted">Kerala（KSRTC）与泰米尔纳德邦际巴士均可到达 Munnar 镇；镇内设 KSRTC 汽车站，也有私营 Volvo / 普通班车。山路弯多，易晕车者请提前准备。</p></div>
+            <div class="card p-4"><h3 class="font-bold">🚕 出租车 / By Taxi</h3><p class="mt-2 text-sm leading-7 muted">机场、火车站均有预付出租车；Munnar 镇内可乘出租车或机动三轮（auto-rickshaw）。山路建议包车一日游，比多次打车更省心。</p></div>
+          </div>
+
+          <p class="mt-7 text-sm font-bold muted">从 Munnar 镇到玫瑰园（约 3 km，沿 Mattupetty 方向）：</p>
+          <div class="route mt-3">
             <div class="route-step"><div class="route-no">1</div><div><h3 class="font-bold">Mattupetty / Top Station റോഡ് പിടിക്കുക</h3><p class="mt-1 text-sm leading-7 muted">മുന്നാർ സെൻട്രൽ ഭാഗത്തുനിന്ന് മാട്ടുപ്പെട്ടി ദിശയിലേക്ക് ടാക്സി, ഓട്ടോറിക്ഷ, സ്വകാര്യവാഹനം എന്നിവ എളുപ്പമാണ്.</p></div></div>
             <div class="route-step"><div class="route-no">2</div><div><h3 class="font-bold">Rose Nagar ഭാഗം ശ്രദ്ധിക്കുക</h3><p class="mt-1 text-sm leading-7 muted">ഗാർഡൻ റോഡിനോട് ചേർന്നതാണ്. തിരക്കുള്ള സമയങ്ങളിൽ ഇറങ്ങുന്നതിനും പാർക്ക് ചെയ്യുന്നതിനും അധിക സമയം കണക്കാക്കുക.</p></div></div>
             <div class="route-step"><div class="route-no">3</div><div><h3 class="font-bold">ഒറ്റ റൂട്ടിൽ കൂടുതൽ സ്ഥലങ്ങൾ</h3><p class="mt-1 text-sm leading-7 muted">Photo Point → Rose Garden → Mattupetty Dam → Echo Point / Kundala Lake → Top Station എന്ന ക്രമത്തിൽ ഒരു ദിവസത്തെ റൂട്ട് പ്ലാൻ ചെയ്യാം.</p></div></div>
@@ -231,21 +341,38 @@ const faqJsonLd = {
       </div>
     </section>
 
+    <section class="section bg-[#f6f2ea]">
+      <div class="wrap">
+        <p class="eyebrow">സന്ദർശക സൗകര്യങ്ങൾ</p>
+        <h2 class="section-title mt-2">访客服务与周边设施 · Visitor Services</h2>
+        <p class="mt-3 max-w-3xl leading-8 muted">以下为类型化概述，帮助您规划行程；具体点位与营业状态请以现场或官方信息为准（本页不推荐具体商户）。</p>
+        <div class="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <article class="card p-6"><div class="icon">🚻</div><h3 class="mt-4 font-bold">洗手间 / Restrooms</h3><p class="mt-2 text-sm leading-7 muted">主要观景点与园区周边通常设有公共或收费洗手间；建议随身携带零钱，山区设施相对简单。</p></article>
+          <article class="card p-6"><div class="icon">🅿️</div><h3 class="mt-4 font-bold">停车 / Parking</h3><p class="mt-2 text-sm leading-7 muted">园区及主要景点附近有路边与划定停车区；周末与节假日车位紧张，建议早点到达或错峰。</p></article>
+          <article class="card p-6"><div class="icon">🍽️</div><h3 class="mt-4 font-bold">餐饮 / Dining</h3><p class="mt-2 text-sm leading-7 muted">Munnar 镇内餐饮类型丰富：南印度素食、综合菜系、面包房与咖啡馆、酒店餐厅，以及园区周边的茶摊与小食。</p></article>
+          <article class="card p-6"><div class="icon">🛏️</div><h3 class="mt-4 font-bold">住宿 / Stay</h3><p class="mt-2 text-sm leading-7 muted">从经济型旅馆、中端度假村、茶园民宿到 plantation stay 均有；旺季与节假日建议提前预订。</p></article>
+          <article class="card p-6"><div class="icon">🛒</div><h3 class="mt-4 font-bold">商超 / Convenience</h3><p class="mt-2 text-sm leading-7 muted">镇内有多类杂货与便利店、药店；偏远景点周边补给有限，建议在镇上备好饮水与零食。</p></article>
+          <article class="card p-6"><div class="icon">⛽</div><h3 class="mt-4 font-bold">加油充电 / Fuel &amp; EV</h3><p class="mt-2 text-sm leading-7 muted">Munnar 镇及周边设有加油站；电动车充电桩仍较稀少，长途自驾请提前规划补能。</p></article>
+        </div>
+      </div>
+    </section>
+
     <section class="section bg-[#153f33] text-white">
       <div class="wrap">
         <p class="eyebrow !text-pink-200">ചുറ്റുമുള്ള രുചികൾ</p><h2 class="section-title mt-2">സന്ദർശനത്തിന് ശേഷം ഭക്ഷണം</h2>
         <div class="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">Saravana Bhavan</h3><p class="mt-2 text-sm leading-7 text-white/70">ദക്ഷിണേന്ത്യൻ വെജിറ്റേറിയൻ ഭക്ഷണത്തിന് പ്രശസ്തമായ മുന്നാർ ഓപ്ഷൻ.</p></article>
-          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">Gurubhavan</h3><p class="mt-2 text-sm leading-7 text-white/70">ഇന്ത്യൻ വിഭവങ്ങൾ, ബിരിയാണി എന്നിവയ്ക്ക് യാത്രക്കാർ പതിവായി തിരഞ്ഞെടുക്കുന്ന സ്ഥലം.</p></article>
-          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">Al Buhari</h3><p class="mt-2 text-sm leading-7 text-white/70">വേഗത്തിൽ ലഭിക്കുന്ന ഇന്ത്യൻ ഭക്ഷണം, ബജറ്റ് സൗഹൃദ ഓപ്ഷനുകൾ.</p></article>
-          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">KTDC Tea County Restaurant</h3><p class="mt-2 text-sm leading-7 text-white/70">ഹോട്ടൽ ഡൈനിംഗ് അന്തരീക്ഷത്തിൽ ഭക്ഷണം ആഗ്രഹിക്കുന്നവർക്ക്.</p></article>
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">ദക്ഷിണേന്ത്യൻ വെജിറ്റേറിയൻ</h3><p class="mt-2 text-sm leading-7 text-white/70">ദക്ഷിണേന്ത്യൻ വെജിറ്റേറിയൻ ഭക്ഷണശാലകൾ — ഇഡ്ഡലി, ദോശ, സാന്പാർ തുടങ്ങിയവ.</p></article>
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">ബിരിയാണി / ഇന്ത്യൻ</h3><p class="mt-2 text-sm leading-7 text-white/70">ഇന്ത്യൻ വിഭവങ്ങളും ബിരിയാണിയും വാഗ്ദാനം ചെയ്യുന്ന റെസ്റ്റോറന്റുകൾ.</p></article>
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">കഫേ / ബേക്കറി</h3><p class="mt-2 text-sm leading-7 text-white/70">പ്രഭാത-കഫേ, ബേക്കറി, പേസ്ട്രികൾ — ഹൽക്കായ ഭക്ഷണത്തിന്.</p></article>
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">ഹോട്ടൽ ഡൈനിംഗ്</h3><p class="mt-2 text-sm leading-7 text-white/70">റിസോർട്ട്/ഹോട്ടൽ റെസ്റ്റോറന്റുകൾ — കുടുംബാടിസ്ഥാനത്തിലുള്ള ഇരിപ്പിട ഭക്ഷണം.</p></article>
         </div>
       </div>
     </section>
 
     <section class="section">
       <div class="wrap">
-        <p class="eyebrow">അടുത്തതായി എവിടെ?</p><h2 class="section-title mt-2">Landmarks &amp; Attractions Around {entity.shortName}<span class="mt-2 block text-xl font-semibold tracking-normal muted">സമീപ ആകർഷണങ്ങൾ</span></h2>
+        <p class="eyebrow">അടുത്തതായി എവിടെ?</p><h2 class="section-title mt-2">Landmarks &amp; Attractions Around {entity.shortName}</h2>
+        <p class="mt-2 text-xl font-semibold muted">സമീപ ആകർഷണങ്ങൾ</p>
         <p class="mt-4 max-w-3xl leading-8 muted">When visiting <strong>{entity.fullName}</strong>, visitors can easily explore surrounding historical landmarks and points of interest, including <strong>{entity.nearby1}</strong> and <strong>{entity.nearby2}</strong>.</p>
         <div class="mt-8 grid gap-4 md:grid-cols-3">
           <article class="card overflow-hidden"><div class="p-6"><span class="chip">📍 ഏകദേശം 1.5 കി.മീ.</span><h3 class="mt-4 text-xl font-bold">Photo Point</h3><p class="mt-2 text-sm leading-7 muted">ചായത്തോട്ട പശ്ചാത്തലത്തിൽ വേഗം ഫോട്ടോ എടുക്കാൻ പറ്റുന്ന ജനപ്രിയ റോഡ്‌സൈഡ് സ്റ്റോപ്പ്.</p></div></article>
@@ -254,6 +381,90 @@ const faqJsonLd = {
           <article class="card overflow-hidden"><div class="p-6"><span class="chip">🌊 മാട്ടുപ്പെട്ടി റൂട്ട്</span><h3 class="mt-4 text-xl font-bold">Mattupetty Dam</h3><p class="mt-2 text-sm leading-7 muted">ബോട്ടിംഗ്, ജലാശയ കാഴ്ച, ചായത്തോട്ട റോഡ് ഡ്രൈവ് എന്നിവയ്‌ക്ക്.</p></div></article>
           <article class="card overflow-hidden"><div class="p-6"><span class="chip">🌿 തുടർ യാത്ര</span><h3 class="mt-4 text-xl font-bold">Kundala Lake</h3><p class="mt-2 text-sm leading-7 muted">ശാന്തമായ തടാകക്കാഴ്ചയും ബോട്ടിംഗ് ഓപ്ഷനുകളും ഉള്ള മലനിരകളിലെ സ്റ്റോപ്പ്.</p></div></article>
           <article class="card overflow-hidden"><div class="p-6"><span class="chip">⛰️ ഉയർന്ന കാഴ്ചപ്പാട്</span><h3 class="mt-4 text-xl font-bold">Top Station</h3><p class="mt-2 text-sm leading-7 muted">മുന്നാർ റൂട്ടിലെ ഏറ്റവും ഉയർന്ന, ദൂരക്കാഴ്ചകൾക്ക് പ്രശസ്തമായ അവസാന സ്റ്റോപ്പുകളിൽ ഒന്ന്.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-[#eef5ec]">
+      <div class="wrap">
+        <p class="eyebrow">യാത്രാ നിർദ്ദേശങ്ങൾ</p>
+        <h2 class="section-title mt-2">行程推荐 · Suggested Itineraries</h2>
+
+        <div class="mt-8 grid gap-6 lg:grid-cols-2">
+          <div class="card p-6 md:p-8">
+            <h3 class="text-xl font-bold">半日游 / Half-Day</h3>
+            <p class="mt-2 text-sm leading-7 muted">适合时间有限或顺路停靠。</p>
+            <ol class="mt-4 space-y-2 text-sm leading-7 muted list-decimal pl-5">
+              <li>Munnar 镇出发 → Rose Garden（约 3 km）</li>
+              <li>园区漫步、拍照约 45–75 分钟</li>
+              <li>顺路 Photo Point 短停 → 返回镇上</li>
+            </ol>
+          </div>
+          <div class="card p-6 md:p-8">
+            <h3 class="text-xl font-bold">全日游 / Full-Day</h3>
+            <p class="mt-2 text-sm leading-7 muted">把玫瑰园串入经典环线。</p>
+            <ol class="mt-4 space-y-2 text-sm leading-7 muted list-decimal pl-5">
+              <li>Rose Garden → Mattupetty Dam（游船）</li>
+              <li>Kundala Lake → Echo Point</li>
+              <li>Pothamedu Viewpoint 看谷地</li>
+              <li>Top Station（环线最高点）返回，途中可访 Kannan Devan Tea Museum</li>
+            </ol>
+          </div>
+        </div>
+
+        <h3 class="mt-10 text-2xl font-bold">按人群定制的路线</h3>
+        <div class="mt-5 grid gap-4 md:grid-cols-3">
+          <article class="card p-6"><div class="icon">👨‍👩‍👧</div><h4 class="mt-4 font-bold">亲子家庭 / Families</h4><p class="mt-2 text-sm leading-7 muted">以平缓路段为主：玫瑰园 + Mattupetty 游船 + 茶园博物馆；避免长距离徒步，随身携带饮水与零食，注意台阶与护栏。</p></article>
+          <article class="card p-6"><div class="icon">📷</div><h4 class="mt-4 font-bold">摄影自然 / Photo &amp; Nature</h4><p class="mt-2 text-sm leading-7 muted">清晨薄雾与柔光最佳：Pothamedu Viewpoint 日出、玫瑰园、Top Station 远景；带长焦与微距，留意天气窗口。</p></article>
+          <article class="card p-6"><div class="icon">♿</div><h4 class="mt-4 font-bold">低体力无障碍 / Easy &amp; Accessible</h4><p class="mt-2 text-sm leading-7 muted">以可车达的观景台与园区平地为主，分段休息；部分梯田有台阶，老人与膝痛者请放慢节奏、穿防滑鞋。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">കാലാവസ്ഥയും ശാസ്ത്രവും</p>
+        <h2 class="section-title mt-2">季节策略与科普 · Seasons &amp; Stewardship</h2>
+
+        <div class="mt-8 overflow-x-auto">
+          <table class="w-full border-collapse text-sm">
+            <thead>
+              <tr class="bg-[color:var(--fern)] text-white">
+                <th class="p-3 text-left font-bold">季节 / Season</th>
+                <th class="p-3 text-left font-bold">月份</th>
+                <th class="p-3 text-left font-bold">气温</th>
+                <th class="p-3 text-left font-bold">天气</th>
+                <th class="p-3 text-left font-bold">推荐</th>
+                <th class="p-3 text-left font-bold">提示</th>
+                <th class="p-3 text-left font-bold">人流</th>
+              </tr>
+            </thead>
+            <tbody class="text-[color:var(--ink)]">
+              <tr class="border-b border-[#e3ebdf]"><td class="p-3 font-bold">冬季 Winter</td><td class="p-3">12–2 月</td><td class="p-3">8–25°C</td><td class="p-3">晴朗干爽</td><td class="p-3">摄影、徒步、观景</td><td class="p-3">夜间偏凉，带薄外套</td><td class="p-3">中—高</td></tr>
+              <tr class="border-b border-[#e3ebdf] bg-[#f6f2ea]"><td class="p-3 font-bold">春季 Pre-monsoon</td><td class="p-3">3–5 月</td><td class="p-3">15–32°C</td><td class="p-3">暖、偶有阵雨</td><td class="p-3">花卉观赏</td><td class="p-3">午后偏热，早出</td><td class="p-3">中</td></tr>
+              <tr class="border-b border-[#e3ebdf]"><td class="p-3 font-bold">西南季风 SW Monsoon</td><td class="p-3">6–9 月</td><td class="p-3">18–28°C</td><td class="p-3">多雨、雾大</td><td class="p-3">观绿、避暑</td><td class="p-3">山路易滑，关注塌方</td><td class="p-3">低</td></tr>
+              <tr class="border-b border-[#e3ebdf] bg-[#f6f2ea]"><td class="p-3 font-bold">季风后 Post-monsoon</td><td class="p-3">10–11 月</td><td class="p-3">15–28°C</td><td class="p-3">转晴、舒适</td><td class="p-3">出行、自驾</td><td class="p-3">能见度恢复</td><td class="p-3">中</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-3 text-xs source-note">气候概况基于 Munnar 地区长期气候常态（约 30 年气候态）整理，仅作季节参考；实时天气与降雨请以页面天气模块及当地预报为准。</p>
+
+        <div class="mt-10 grid gap-8 lg:grid-cols-2">
+          <div>
+            <h3 class="text-xl font-bold">科普：西高止山脉的生态</h3>
+            <p class="mt-3 leading-8 muted">Munnar 位于西高止山脉（Western Ghats）边缘，这里是全球重要的生物多样性热点之一，海拔约 1,500–1,700 m，云雾林、茶园与原始林交错。玫瑰园作为花卉与苗圃展示点，让游客在短途停留中接触高山植物的色彩与结构。</p>
+            <p class="mt-3 leading-8 muted">周边历史上以茶园种植闻名：19 世纪末英国种植园体系奠定格局，Kannan Devan 茶园等遗迹延续至今；如今自然观光与生态科普成为 Munnar 的另一张名片。</p>
+          </div>
+          <div class="card p-6 md:p-8">
+            <h3 class="text-xl font-bold">访客责任 / Responsible Visiting</h3>
+            <ul class="mt-3 space-y-2 text-sm leading-7 muted list-disc pl-5">
+              <li>沿步道行走，不采摘花卉、不挖掘植物。</li>
+              <li>自带水杯，减少一次性塑料；垃圾随身带走。</li>
+              <li>保持安静，不投喂、不惊扰野生动物。</li>
+              <li>雾季与雨季注意防滑，听从现场安全提示。</li>
+              <li>支持本地社区与可持续旅游。</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -291,7 +502,7 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <section class="section bg-[#f7eef1]">
+    <section class="section bg-[#f7eef1]" id="faq">
       <div class="wrap grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
         <div><p class="eyebrow">FAQ</p><h2 class="section-title mt-2">പതിവ് ചോദ്യങ്ങൾ</h2><p class="mt-4 leading-8 muted">വിവരങ്ങൾ യാത്രാസൂചനയായി മാത്രം ഉപയോഗിക്കുക; സ്ഥലത്തെ നിലവിലെ അറിയിപ്പുകൾക്കാണ് മുൻഗണന.</p></div>
         <div class="faq card px-6 py-2">

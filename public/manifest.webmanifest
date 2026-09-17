@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "Munnar Rose Garden — Munnar Visitor Guide",
+  "short_name": "Munnar Rose",
+  "description": "Visitor guide to Munnar Rose Garden in Munnar, Kerala, India: location map, 08:00-18:00 hours, entry fee, nearby Mattupetty Dam and Top Station, plus travel tips.",
+  "lang": "ml-IN",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fffaf5",
+  "theme_color": "#1f654e",
+  "categories": ["travel", "navigation", "lifestyle"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Location & Map", "short_name": "Map", "url": "/#map" },
+    { "name": "Reviews", "short_name": "Reviews", "url": "/#reviews" },
+    { "name": "FAQ", "short_name": "FAQ", "url": "/#faq" }
+  ]
+}

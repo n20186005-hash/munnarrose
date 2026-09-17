@@ -1,0 +1,25 @@
+# build output
+dist/
+dist-verify/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# environment
+.env
+.env.production
+
+# cloudflare / wrangler
+.wrangler/
+.dev.vars
+
+# misc
+.DS_Store
+*.pem
