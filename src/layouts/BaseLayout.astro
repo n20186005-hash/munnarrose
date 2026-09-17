@@ -1,8 +1,18 @@
 ---
 import '../styles/global.css';
-const { title, description, image = '/images/rose-garden-hero.jpg' } = Astro.props;
-const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
-const ogImage = Astro.site ? new URL(image, Astro.site).toString() : undefined;
+const {
+  title,
+  description,
+  ogTitle = title,
+  ogDescription = description,
+  image = '/images/rose-garden-hero.jpg',
+  imageAlt = 'Munnar Rose Garden in Munnar',
+  siteName = 'Munnar Rose Garden'
+} = Astro.props;
+const SITE_FALLBACK = 'https://munnarrose.com';
+const site = Astro.site ?? new URL(SITE_FALLBACK);
+const canonical = new URL(Astro.url.pathname, site).toString();
+const ogImage = new URL(image, site).toString();
 ---
 <!doctype html>
 <html lang="ml-IN">
@@ -12,23 +22,42 @@ const ogImage = Astro.site ? new URL(image, Astro.site).toString() : undefined;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#1f654e" />
     <title>{title}</title>
-    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    {canonical && <meta property="og:url" content={canonical} />}
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="ml_IN" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="application-name" content={siteName} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Munnar Rose" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HXM22WWPKP"></script>
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments)}
       gtag('js', new Date());
       gtag('config', 'G-HXM22WWPKP');
+    </script>
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      }
     </script>
   </head>
   <body>

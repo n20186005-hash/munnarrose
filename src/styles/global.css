@@ -60,6 +60,9 @@ a { color: inherit; }
 footer { background:#143d31; color:#eaf3ee; padding:3.4rem 0; }
 .footer-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:2rem; }
 .source-note { font-size:.78rem; color:#769087; }
+.stars { position:relative; display:inline-block; font-size:1.55rem; line-height:1; letter-spacing:.12em; color:#dfe5dc; }
+.stars-bg { display:block; }
+.stars-fg { position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:#f0a32b; }
 @media (max-width: 900px){
   .facts{grid-template-columns:repeat(2,1fr)} .photo-grid{grid-template-columns:1fr 1fr;grid-template-rows:300px 190px}.photo-grid img:first-child{grid-column:1/3;grid-row:auto}.info-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr}
 }
