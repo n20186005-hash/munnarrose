@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #16352c;
+  --fern: #1f654e;
+  --leaf: #6e9f64;
+  --mist: #f3f7f1;
+  --petal: #d83d72;
+  --rose: #f08bad;
+  --cream: #fffaf5;
+  --gold: #d8aa54;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 8%, rgba(240,139,173,.18), transparent 20rem),
+    radial-gradient(circle at 90% 24%, rgba(110,159,100,.14), transparent 24rem),
+    var(--cream);
+  font-family: "Noto Sans Malayalam", "Nirmala UI", system-ui, sans-serif;
+}
+a { color: inherit; }
+::selection { background: #f6bfd2; color: #183a30; }
+
+.wrap { width: min(1180px, calc(100% - 2rem)); margin-inline: auto; }
+.glass { background: rgba(255,255,255,.78); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.82); }
+.section { padding: 5.4rem 0; }
+.eyebrow { letter-spacing: .12em; text-transform: uppercase; font-size: .74rem; font-weight: 800; color: var(--petal); }
+.title { font-size: clamp(2rem, 4vw, 4.7rem); line-height: 1.05; font-weight: 850; letter-spacing: -.035em; }
+.section-title { font-size: clamp(1.7rem, 3vw, 3rem); line-height: 1.12; font-weight: 830; letter-spacing: -.025em; }
+.muted { color: #587066; }
+.card { border: 1px solid #e8ece3; border-radius: 1.5rem; background: rgba(255,255,255,.88); box-shadow: 0 16px 55px rgba(39,70,56,.07); }
+.hero-photo { min-height: 74vh; background-size: cover; background-position: center; position: relative; overflow: hidden; border-radius: 0 0 2.8rem 2.8rem; }
+.hero-photo::after { content:""; position:absolute; inset:0; background: linear-gradient(90deg, rgba(11,38,30,.78), rgba(11,38,30,.16) 58%, rgba(11,38,30,.28)); }
+.petals { pointer-events:none; position:absolute; inset:0; overflow:hidden; opacity:.9; }
+.petal { position:absolute; width:18px; height:12px; border-radius: 90% 10% 90% 10%; background: rgba(255,191,210,.75); transform: rotate(var(--r)); }
+.facts { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:.8rem; }
+.fact { padding:1rem 1.1rem; border-radius:1.1rem; background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:white; }
+.photo-grid { display:grid; grid-template-columns: 1.4fr .9fr .9fr; grid-template-rows: 220px 220px; gap:.75rem; }
+.photo-grid img { width:100%; height:100%; object-fit:cover; border-radius:1.35rem; }
+.photo-grid img:first-child { grid-row:1/3; }
+.flowers { position:relative; }
+.flowers::before { content:""; position:absolute; left:-1.2rem; top:-1rem; width:4.5rem; height:4.5rem; border-radius:50%; border:12px dotted rgba(216,61,114,.13); }
+.info-grid { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:1rem; }
+.info-card { padding:1.4rem; }
+.icon { width:2.6rem; height:2.6rem; display:grid; place-items:center; border-radius:.9rem; background:#f9dce6; color:#a82b58; font-size:1.2rem; }
+.route { display:grid; gap:1rem; }
+.route-step { display:grid; grid-template-columns:52px 1fr; gap:1rem; align-items:start; }
+.route-no { width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--fern); color:white; font-weight:800; box-shadow:0 8px 20px rgba(31,101,78,.2); }
+.map-frame { width:100%; min-height:460px; border:0; border-radius:1.5rem; }
+.faq details { border-bottom:1px solid #e5ebe4; padding:1.15rem 0; }
+.faq summary { font-weight:760; cursor:pointer; list-style:none; }
+.faq summary::-webkit-details-marker { display:none; }
+.faq p { color:#5d7168; line-height:1.8; }
+.chip { display:inline-flex; align-items:center; gap:.4rem; border-radius:999px; padding:.48rem .75rem; background:#eef5ec; font-size:.82rem; font-weight:700; }
+.notice { border-left:4px solid var(--gold); background:#fff7e5; padding:1rem 1.1rem; border-radius:.8rem; }
+footer { background:#143d31; color:#eaf3ee; padding:3.4rem 0; }
+.footer-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:2rem; }
+.source-note { font-size:.78rem; color:#769087; }
+@media (max-width: 900px){
+  .facts{grid-template-columns:repeat(2,1fr)} .photo-grid{grid-template-columns:1fr 1fr;grid-template-rows:300px 190px}.photo-grid img:first-child{grid-column:1/3;grid-row:auto}.info-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr}
+}
+@media (max-width: 620px){
+  .section{padding:4rem 0}.facts{grid-template-columns:1fr}.photo-grid{display:block}.photo-grid img{height:230px;margin-bottom:.75rem}.info-grid{grid-template-columns:1fr}.hero-photo{min-height:86vh}.map-frame{min-height:360px}
+}

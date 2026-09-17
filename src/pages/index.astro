@@ -1,0 +1,183 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const imageSources = {
+  hero: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Flora_at_Munnar_Rose_Gardens_11.jpg',
+  pond: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Flora_at_Munnar_Rose_Gardens_12.jpg',
+  foliage: 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Flora_at_Munnar_Rose_Gardens_13.jpg',
+  flower: 'https://upload.wikimedia.org/wikipedia/commons/5/54/A_flower_in_the_Rose_garden_in_Munnar_01.jpg'
+};
+
+const siteUrl = Astro.site?.toString();
+const attractionJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': ['TouristAttraction', 'LocalBusiness'],
+  name: 'Munnar Rose Garden',
+  alternateName: 'KFDC Floriculture Centre',
+  description: 'മുന്നാറിലെ റോസ് നഗറിൽ, മാട്ടുപ്പെട്ടി റോഡിനരികിലെ പുഷ്പോദ്യാനം.',
+  url: siteUrl,
+  image: siteUrl ? [new URL('/images/rose-garden-hero.jpg', siteUrl).toString()] : undefined,
+  telephone: '+91 94968 22059',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Munnar - Aluva Rd, Rose Nagar, Mattupetty',
+    addressLocality: 'Munnar',
+    addressRegion: 'Kerala',
+    postalCode: '685612',
+    addressCountry: 'IN'
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 10.08583, longitude: 77.07583 },
+  openingHoursSpecification: [{
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+    opens: '08:00', closes: '18:00'
+  }],
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.3', bestRating: '5' },
+  priceRange: '₹'
+};
+
+const faq = [
+  ['റോസ് ഗാർഡൻ സാധാരണ എപ്പോൾ തുറന്നിരിക്കും?', 'Google Maps-ൽ ഇപ്പോൾ ദിവസവും രാവിലെ 8 മുതൽ വൈകിട്ട് 6 വരെ എന്നാണ് കാണിക്കുന്നത്. സീസണൽ മാറ്റങ്ങൾ ഉണ്ടാകാം; യാത്രയ്ക്കു മുമ്പ് സമയക്രമം വീണ്ടും പരിശോധിക്കുക.'],
+  ['പ്രവേശന ഫീസ് എത്രയാണ്?', 'സമീപകാല യാത്രക്കാരുടെ റിപ്പോർട്ടുകളിൽ ഒരാൾക്ക് ഏകദേശം ₹50 എന്ന് കാണുന്നു. നിരക്കുകൾ മാറാവുന്നതിനാൽ ടിക്കറ്റ് കൗണ്ടറിലെ നിലവിലെ നിരക്ക് സ്ഥിരീകരിക്കുക.'],
+  ['എത്ര സമയം മാറ്റിവെക്കണം?', 'ഫോട്ടോഗ്രഫിയോടുകൂടിയ ശാന്തമായ സന്ദർശനത്തിന് 45–75 മിനിറ്റ് സാധാരണയായി മതിയാകും. പൂക്കളെയും നഴ്സറി വിഭാഗങ്ങളെയും വിശദമായി കാണണമെങ്കിൽ കൂടുതൽ സമയം അനുവദിക്കാം.'],
+  ['കുട്ടികളോടൊപ്പം വരാൻ പറ്റുമോ?', 'അതെ. എന്നാൽ തോട്ടം കുന്നിൻ ചെരിവിലായി ടെറസുകളായി ക്രമീകരിച്ചിരിക്കുന്നതിനാൽ ചില ഭാഗങ്ങളിൽ പടികളും ചരിവുകളും ഉണ്ടാകാം.'],
+  ['പാർക്കിംഗ് ലഭ്യമാണോ?', 'റോഡ്‌സൈഡ്/പ്രാദേശിക പാർക്കിംഗ് സാധാരണ ലഭ്യമാണെന്ന് പ്രാദേശിക ഗൈഡ് സ്രോതസ്സുകൾ പറയുന്നു. തിരക്കേറിയ സമയങ്ങളിൽ സ്ഥലം പരിമിതമായേക്കാം.'],
+  ['മഴക്കാലത്ത് സന്ദർശിക്കാമോ?', 'സന്ദർശിക്കാം, പക്ഷേ പാതകൾ നനഞ്ഞിരിക്കാം. ഗ്രിപ്പ് ഉള്ള ചെരുപ്പും ലളിതമായ മഴക്കോടും ഉപകാരപ്പെടും.']
+];
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map(([q,a]) => ({ '@type':'Question', name:q, acceptedAnswer:{ '@type':'Answer', text:a } }))
+};
+---
+<BaseLayout title="മുന്നാർ റോസ് ഗാർഡൻ | പൂക്കളും മലമഞ്ഞും ചേർന്നൊരു ചെറുസഞ്ചാരം" description="മുന്നാർ റോസ് ഗാർഡൻ സന്ദർശന ഗൈഡ് — സമയം, ഫീസ്, യാത്രാമാർഗം, പാർക്കിംഗ്, ഭക്ഷണം, സമീപ ആകർഷണങ്ങൾ, Google മാപ്പ്, FAQ.">
+  <script type="application/ld+json" set:html={JSON.stringify(attractionJsonLd)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+  <header class="hero-photo" style={`background-image:url('${imageSources.hero}')`}>
+    <nav class="wrap relative z-10 flex items-center justify-between py-5 text-white">
+      <a href="#top" class="flex items-center gap-3 no-underline" aria-label="മുന്നാർ റോസ് ഗാർഡൻ ഹോം">
+        <img src="/icons/logo.svg" alt="" width="48" height="48" />
+        <div><strong class="block text-sm tracking-wide">MUNNAR</strong><span class="text-xs opacity-80">ROSE GARDEN</span></div>
+      </a>
+      <a href="#map" class="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm no-underline backdrop-blur">മാപ്പ് കാണുക ↗</a>
+    </nav>
+    <div id="top" class="wrap relative z-10 flex min-h-[62vh] items-end pb-10 text-white">
+      <div class="max-w-4xl">
+        <p class="eyebrow !text-pink-200">മുന്നാർ · കേരളം · 685612</p>
+        <h1 class="title mt-3">മലമഞ്ഞിനിടയിലെ<br/>ഒരു നിറഞ്ഞ പൂക്കാലം.</h1>
+        <p class="mt-5 max-w-2xl text-base leading-8 text-white/85">റോസ് നഗറിൽ, മാട്ടുപ്പെട്ടിയിലേക്കുള്ള വഴിയരികിൽ പച്ചമലകളുടെയും ചായത്തോട്ടങ്ങളുടെയും പശ്ചാത്തലത്തിൽ ടെറസുകളായി വിരിയുന്ന മുന്നാർ റോസ് ഗാർഡൻ.</p>
+        <div class="facts mt-8">
+          <div class="fact"><span class="text-xs opacity-70">Google റേറ്റിംഗ്</span><strong class="mt-1 block text-lg">4.3 / 5</strong></div>
+          <div class="fact"><span class="text-xs opacity-70">സമയം</span><strong class="mt-1 block text-lg">08:00–18:00</strong></div>
+          <div class="fact"><span class="text-xs opacity-70">ശുപാർശ സമയം</span><strong class="mt-1 block text-lg">45–75 മിനിറ്റ്</strong></div>
+          <div class="fact"><span class="text-xs opacity-70">സ്ഥാനം</span><strong class="mt-1 block text-lg">Rose Nagar</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="petals"><i class="petal" style="left:11%;top:19%;--r:18deg"></i><i class="petal" style="left:74%;top:22%;--r:73deg"></i><i class="petal" style="left:88%;top:55%;--r:18deg"></i><i class="petal" style="left:62%;top:72%;--r:120deg"></i></div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="wrap grid gap-10 lg:grid-cols-[.9fr_1.4fr] lg:items-center">
+        <div class="flowers">
+          <p class="eyebrow">പുഷ്പോദ്യാനം</p>
+          <h2 class="section-title mt-2">റോസുകൾ മാത്രം അല്ല.</h2>
+          <p class="mt-5 leading-8 muted">റോസുകൾക്കൊപ്പം വിവിധ അലങ്കാരച്ചെടികൾ, ജലസസ്യങ്ങൾ, പച്ചച്ചെടികൾ, ഔഷധ/മസാല സസ്യങ്ങൾ എന്നിവയും കാണാം. കുന്നിൻ ചെരിവിനനുസരിച്ചുള്ള പടിനില ക്രമീകരണം തോട്ടത്തിന് മുന്നാറിന്റെ സ്വാഭാവിക ഭൂപ്രകൃതിയോട് ചേർന്നൊരു വ്യക്തിത്വം നൽകുന്നു.</p>
+          <div class="mt-6 flex flex-wrap gap-2"><span class="chip">🌹 നിറവൈവിധ്യം</span><span class="chip">📷 ഫോട്ടോഗ്രഫി</span><span class="chip">🌿 സസ്യപരിചയം</span><span class="chip">⛰️ മലക്കാഴ്ച</span></div>
+        </div>
+        <div class="photo-grid" aria-label="മുന്നാർ റോസ് ഗാർഡന്റെ യഥാർത്ഥ ചിത്രങ്ങൾ">
+          <img src={imageSources.hero} alt="മുന്നാർ റോസ് ഗാർഡനിലെ വർണാഭമായ ഇംപേഷ്യൻസ് പൂക്കൾ" loading="lazy" />
+          <img src={imageSources.pond} alt="റോസ് ഗാർഡനിലെ ജലസസ്യക്കുളം" loading="lazy" />
+          <img src={imageSources.foliage} alt="ചുവന്ന ഇലച്ചെടികളാൽ വളഞ്ഞ അലങ്കാരക്കുളം" loading="lazy" />
+          <img src={imageSources.flower} alt="മുന്നാർ റോസ് ഗാർഡനിലെ പിങ്ക് പൂവ്" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-[#eef5ec]">
+      <div class="wrap">
+        <p class="eyebrow">പ്ലാൻ ചെയ്യാം</p><h2 class="section-title mt-2">സന്ദർശനത്തിന് വേണ്ട പ്രധാന വിവരങ്ങൾ</h2>
+        <div class="info-grid mt-8">
+          <article class="card info-card"><div class="icon">🎟️</div><h3 class="mt-4 font-bold">ടിക്കറ്റ് / ഫീസ്</h3><p class="mt-2 text-sm leading-7 muted">യാത്രക്കാരുടെ സമീപകാല റിപ്പോർട്ടുകളിൽ ഏകദേശം ₹50/വ്യക്തി. നിരക്കുകൾ മാറാം; കൗണ്ടറിൽ സ്ഥിരീകരിക്കുക.</p></article>
+          <article class="card info-card"><div class="icon">🕗</div><h3 class="mt-4 font-bold">മികച്ച സമയം</h3><p class="mt-2 text-sm leading-7 muted">രാവിലെ 8–10 അല്ലെങ്കിൽ വൈകുന്നേരത്തെ മൃദുവായ വെളിച്ചം. മഴയ്ക്ക് ശേഷമുള്ള പച്ചപ്പും മനോഹരം, പക്ഷേ പാതകൾ വഴുക്കാം.</p></article>
+          <article class="card info-card"><div class="icon">⏱️</div><h3 class="mt-4 font-bold">താമസ സമയം</h3><p class="mt-2 text-sm leading-7 muted">സാധാരണ 45–75 മിനിറ്റ്. സസ്യങ്ങൾ നിരീക്ഷിക്കാനും ഫോട്ടോ എടുക്കാനും ഇഷ്ടമുള്ളവർ കൂടുതൽ സമയം കണക്കാക്കാം.</p></article>
+          <article class="card info-card"><div class="icon">🅿️</div><h3 class="mt-4 font-bold">പാർക്കിംഗ്</h3><p class="mt-2 text-sm leading-7 muted">പ്രാദേശിക ഗൈഡ് സ്രോതസ്സുകൾ പാർക്കിംഗ് ലഭ്യമാണെന്ന് സൂചിപ്പിക്കുന്നു. വാരാന്ത്യ/പീക്ക് സമയങ്ങളിൽ നേരത്തെ എത്തുക.</p></article>
+          <article class="card info-card"><div class="icon">👟</div><h3 class="mt-4 font-bold">നടത്തം</h3><p class="mt-2 text-sm leading-7 muted">ടെറസ് രൂപത്തിലുള്ള തോട്ടം; പടികളും ചെരിവും ഉണ്ട്. മുതിർന്നവർക്കും കാൽമുട്ട് പ്രശ്നമുള്ളവർക്കും സാവധാനമായി നീങ്ങുക.</p></article>
+          <article class="card info-card"><div class="icon">☕</div><h3 class="mt-4 font-bold">സൗകര്യങ്ങൾ</h3><p class="mt-2 text-sm leading-7 muted">ശൗചാലയം, ലഘുഭക്ഷണം/കോഫി, ചെറിയ വിൽപ്പന/നഴ്സറി സൗകര്യങ്ങൾ ഉണ്ടെന്ന് യാത്രാ സ്രോതസ്സുകൾ പറയുന്നു.</p></article>
+        </div>
+        <p class="notice mt-7 text-sm leading-7"><strong>ശ്രദ്ധിക്കുക:</strong> സമയം, ഫീസ്, ക്യാമറ ചാർജ് തുടങ്ങിയവയ്ക്കായി വിവിധ സ്രോതസ്സുകളിൽ ചെറിയ വ്യത്യാസങ്ങൾ കാണുന്നു. പുറപ്പെടും മുമ്പ് Google Maps അല്ലെങ്കിൽ സ്ഥലത്തെ കൗണ്ടർ വഴി വീണ്ടും ഉറപ്പാക്കുക.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap grid gap-10 lg:grid-cols-2">
+        <div>
+          <p class="eyebrow">വിശദമായ യാത്രാമാർഗം</p><h2 class="section-title mt-2">മുന്നാർ പട്ടണത്തിൽ നിന്ന്</h2>
+          <div class="route mt-7">
+            <div class="route-step"><div class="route-no">1</div><div><h3 class="font-bold">Mattupetty / Top Station റോഡ് പിടിക്കുക</h3><p class="mt-1 text-sm leading-7 muted">മുന്നാർ സെൻട്രൽ ഭാഗത്തുനിന്ന് മാട്ടുപ്പെട്ടി ദിശയിലേക്ക് ടാക്സി, ഓട്ടോറിക്ഷ, സ്വകാര്യവാഹനം എന്നിവ എളുപ്പമാണ്.</p></div></div>
+            <div class="route-step"><div class="route-no">2</div><div><h3 class="font-bold">Rose Nagar ഭാഗം ശ്രദ്ധിക്കുക</h3><p class="mt-1 text-sm leading-7 muted">ഗാർഡൻ റോഡിനോട് ചേർന്നതാണ്. തിരക്കുള്ള സമയങ്ങളിൽ ഇറങ്ങുന്നതിനും പാർക്ക് ചെയ്യുന്നതിനും അധിക സമയം കണക്കാക്കുക.</p></div></div>
+            <div class="route-step"><div class="route-no">3</div><div><h3 class="font-bold">ഒറ്റ റൂട്ടിൽ കൂടുതൽ സ്ഥലങ്ങൾ</h3><p class="mt-1 text-sm leading-7 muted">Photo Point → Rose Garden → Mattupetty Dam → Echo Point / Kundala Lake → Top Station എന്ന ക്രമത്തിൽ ഒരു ദിവസത്തെ റൂട്ട് പ്ലാൻ ചെയ്യാം.</p></div></div>
+          </div>
+        </div>
+        <div class="card p-3" id="map">
+          <iframe class="map-frame" title="മുന്നാർ റോസ് ഗാർഡൻ Google മാപ്പ്" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Munnar%20Rose%20Garden%2C%20Munnar%20-%20Aluva%20Rd%2C%20Rose%20Nagar%2C%20Mattupetty%2C%20Munnar%2C%20Kerala%20685612%2C%20India&output=embed&hl=ml&gl=in"></iframe>
+          <div class="p-4"><p class="text-sm font-bold">Munnar - Aluva Rd, Rose Nagar, Mattupetty, Munnar, Kerala 685612</p><a class="mt-2 inline-block text-sm text-[#b52e5f]" href="https://maps.app.goo.gl/caVTicvucY2XJR2x6" target="_blank" rel="noreferrer">Google Maps-ൽ തുറക്കുക ↗</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-[#153f33] text-white">
+      <div class="wrap">
+        <p class="eyebrow !text-pink-200">ചുറ്റുമുള്ള രുചികൾ</p><h2 class="section-title mt-2">സന്ദർശനത്തിന് ശേഷം ഭക്ഷണം</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">Saravana Bhavan</h3><p class="mt-2 text-sm leading-7 text-white/70">ദക്ഷിണേന്ത്യൻ വെജിറ്റേറിയൻ ഭക്ഷണത്തിന് പ്രശസ്തമായ മുന്നാർ ഓപ്ഷൻ.</p></article>
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">Gurubhavan</h3><p class="mt-2 text-sm leading-7 text-white/70">ഇന്ത്യൻ വിഭവങ്ങൾ, ബിരിയാണി എന്നിവയ്ക്ക് യാത്രക്കാർ പതിവായി തിരഞ്ഞെടുക്കുന്ന സ്ഥലം.</p></article>
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">Al Buhari</h3><p class="mt-2 text-sm leading-7 text-white/70">വേഗത്തിൽ ലഭിക്കുന്ന ഇന്ത്യൻ ഭക്ഷണം, ബജറ്റ് സൗഹൃദ ഓപ്ഷനുകൾ.</p></article>
+          <article class="rounded-2xl border border-white/10 bg-white/7 p-5"><h3 class="font-bold">KTDC Tea County Restaurant</h3><p class="mt-2 text-sm leading-7 text-white/70">ഹോട്ടൽ ഡൈനിംഗ് അന്തരീക്ഷത്തിൽ ഭക്ഷണം ആഗ്രഹിക്കുന്നവർക്ക്.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">അടുത്തതായി എവിടെ?</p><h2 class="section-title mt-2">സമീപ ആകർഷണങ്ങൾ</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-3">
+          <article class="card overflow-hidden"><div class="p-6"><span class="chip">📍 ഏകദേശം 1.5 കി.മീ.</span><h3 class="mt-4 text-xl font-bold">Photo Point</h3><p class="mt-2 text-sm leading-7 muted">ചായത്തോട്ട പശ്ചാത്തലത്തിൽ വേഗം ഫോട്ടോ എടുക്കാൻ പറ്റുന്ന ജനപ്രിയ റോഡ്‌സൈഡ് സ്റ്റോപ്പ്.</p></div></article>
+          <article class="card overflow-hidden"><div class="p-6"><span class="chip">🏛️ ഏകദേശം 2.9 കി.മീ.</span><h3 class="mt-4 text-xl font-bold">Kannan Devan Tea Museum</h3><p class="mt-2 text-sm leading-7 muted">മുന്നാറിന്റെ ചായചരിത്രവും പ്രോസസ്സിംഗും അറിയാൻ അനുയോജ്യം.</p></div></article>
+          <article class="card overflow-hidden"><div class="p-6"><span class="chip">🌄 ഏകദേശം 3.2 കി.മീ.</span><h3 class="mt-4 text-xl font-bold">Pothamedu Viewpoint</h3><p class="mt-2 text-sm leading-7 muted">താഴ്വരയും തോട്ടങ്ങളും കാണുന്ന വിശാല കാഴ്ചപ്പാട്.</p></div></article>
+          <article class="card overflow-hidden"><div class="p-6"><span class="chip">🌊 മാട്ടുപ്പെട്ടി റൂട്ട്</span><h3 class="mt-4 text-xl font-bold">Mattupetty Dam</h3><p class="mt-2 text-sm leading-7 muted">ബോട്ടിംഗ്, ജലാശയ കാഴ്ച, ചായത്തോട്ട റോഡ് ഡ്രൈവ് എന്നിവയ്‌ക്ക്.</p></div></article>
+          <article class="card overflow-hidden"><div class="p-6"><span class="chip">🌿 തുടർ യാത്ര</span><h3 class="mt-4 text-xl font-bold">Kundala Lake</h3><p class="mt-2 text-sm leading-7 muted">ശാന്തമായ തടാകക്കാഴ്ചയും ബോട്ടിംഗ് ഓപ്ഷനുകളും ഉള്ള മലനിരകളിലെ സ്റ്റോപ്പ്.</p></div></article>
+          <article class="card overflow-hidden"><div class="p-6"><span class="chip">⛰️ ഉയർന്ന കാഴ്ചപ്പാട്</span><h3 class="mt-4 text-xl font-bold">Top Station</h3><p class="mt-2 text-sm leading-7 muted">മുന്നാർ റൂട്ടിലെ ഏറ്റവും ഉയർന്ന, ദൂരക്കാഴ്ചകൾക്ക് പ്രശസ്തമായ അവസാന സ്റ്റോപ്പുകളിൽ ഒന്ന്.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-[#f7eef1]">
+      <div class="wrap grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
+        <div><p class="eyebrow">FAQ</p><h2 class="section-title mt-2">പതിവ് ചോദ്യങ്ങൾ</h2><p class="mt-4 leading-8 muted">വിവരങ്ങൾ യാത്രാസൂചനയായി മാത്രം ഉപയോഗിക്കുക; സ്ഥലത്തെ നിലവിലെ അറിയിപ്പുകൾക്കാണ് മുൻഗണന.</p></div>
+        <div class="faq card px-6 py-2">
+          {faq.map(([q,a]) => <details><summary>{q}</summary><p>{a}</p></details>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap card p-7 md:p-10">
+        <div class="grid gap-8 md:grid-cols-3">
+          <div><p class="eyebrow">ഫോട്ടോ ഉറവിടം</p><h2 class="mt-2 text-2xl font-bold">യഥാർത്ഥ സ്ഥലചിത്രങ്ങൾ</h2></div>
+          <div class="md:col-span-2 text-sm leading-7 muted"><p>ഈ പേജിലെ തോട്ടചിത്രങ്ങൾ Wikimedia Commons-ലുള്ള Munnar Rose Garden ചിത്രങ്ങളാണ്. പ്രധാന ചിത്രങ്ങൾ IM3847, Soumendra Kumar Sahoo എന്നിവരുടെ CC BY-SA ലൈസൻസിലുള്ള ചിത്രങ്ങളിൽ നിന്നാണ്.</p><p class="mt-2 source-note">സ്ഥലവിവരങ്ങൾ: Google Maps, Kerala Tourism, Tripadvisor, Trawell എന്നിവയിൽ നിന്നുള്ള പരസ്പര പരിശോധന. മാറാവുന്ന വില/സമയ വിവരങ്ങൾ യാത്രയ്ക്ക് മുമ്പ് വീണ്ടും പരിശോധിക്കുക.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-grid">
+      <div><img src="/icons/logo.svg" alt="Munnar Rose Garden" width="64" height="64" /><h2 class="mt-4 text-2xl font-bold">മുന്നാർ റോസ് ഗാർഡൻ</h2><p class="mt-3 max-w-xl text-sm leading-7 text-white/70">പൂക്കളെയും മലനിരകളെയും മനസ്സിലാക്കി, പതുക്കെ കാണാൻ രൂപകൽപ്പന ചെയ്ത സ്വതന്ത്ര യാത്രാ ഗൈഡ്.</p></div>
+      <div class="text-sm leading-7 text-white/70"><details><summary class="cursor-pointer font-bold text-white">സ്വകാര്യത</summary><p class="mt-2">ഈ സൈറ്റിൽ അക്കൗണ്ട്, ലോഗിൻ, ഡാറ്റാബേസ് എന്നിവയില്ല. GA4 വഴി അനാമധേയ ഉപയോഗമെട്രിക്കുകൾ ശേഖരിക്കാം.</p></details><details class="mt-3"><summary class="cursor-pointer font-bold text-white">കുക്കികൾ</summary><p class="mt-2">Google Analytics പ്രവർത്തനത്തിനായി ആവശ്യമായ അനലിറ്റിക്സ് കുക്കികൾ ഉപയോഗിക്കപ്പെടാം.</p></details><details class="mt-3"><summary class="cursor-pointer font-bold text-white">ഉപയോഗ നിബന്ധനകൾ</summary><p class="mt-2">സമയം, ഫീസ്, സൗകര്യങ്ങൾ തുടങ്ങിയ വിവരങ്ങൾ മാറാം. യാത്രയ്ക്കു മുമ്പ് ഔദ്യോഗിക/സ്ഥലത്തെ ഉറവിടങ്ങളിൽ സ്ഥിരീകരിക്കുക.</p></details></div>
+    </div>
+    <div class="wrap mt-8 border-t border-white/10 pt-5 text-xs text-white/50">ഇത് Munnar Rose Garden, KFDC, Kerala Tourism അല്ലെങ്കിൽ ബന്ധപ്പെട്ട സർക്കാർ സ്ഥാപനങ്ങളുടെ ഔദ്യോഗിക വെബ്സൈറ്റ് അല്ല.</div>
+  </footer>
+</BaseLayout>
