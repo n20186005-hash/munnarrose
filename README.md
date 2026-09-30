@@ -17,7 +17,7 @@ Astro + Tailwind CSS + TypeScript 单页景点站，面向 Cloudflare Workers，
 - 图片：`alt` 统一使用「景点全称 - 场景 in 城市, 国家」语义命名
 
 ## 谷歌评分与评价
-- 评分 `4.3 / 5`、评价数 `10,609`，同步时间 `2026 年 9 月`，数据来自 Google Maps 用户评价。
+- 评分 `4.3 / 5`、评价数 `10,645`，同步时间 `2026 年 9 月`，数据来自 Google Maps 用户评价。
 - 仅在页面「谷歌评分与评价」区块与资料来源区块展示，**不写入 JSON-LD**（已移除 `aggregateRating`），并注明「同步自 Google 地图用户评价，同步时间 2026 年 9 月；版权归原作者与 Google 地图所有」。
 - 所有 Google 外部链接（地图嵌入、maps.app.goo.gl 分享链接）均保留。
 

@@ -1,0 +1,13 @@
+# 全站安全头与 HSTS（Cloudflare Pages/Workers 静态资产下发）
+# HTTPS 301 与 www→apex 仍须在 Cloudflare 控制台配置
+# (SSL/TLS → Always Use HTTPS + Rules → Redirect Rules)
+
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/sw.js
+  Cache-Control: no-cache
