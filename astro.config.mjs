@@ -9,8 +9,8 @@ const SITE_URL = 'https://munnarrose.com';
 export default defineConfig({
   site: SITE_URL || undefined,
   output: 'server',
-  adapter: cloudflare({ platformProxy: { enabled: true } }),
-  integrations: SITE_URL ? [sitemap()] : [],
+  adapter: cloudflare({ configPath: 'wrangler.jsonc' }),
+  integrations: SITE_URL ? [sitemap({customPages:['https://munnarrose.com/'],filter:url=>!/(?:404|api|offline)(?:\/|\.html|$)/.test(url)})] : [],
   vite: {
     plugins: [tailwindcss()]
   }
