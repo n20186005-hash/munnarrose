@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {sources, checked} from '../data/guide';
+const url='https://munnarrose.com/sources/';
+const schema=[{'@context':'https://schema.org','@type':'WebPage','@id':url+'#webpage',url,name:'Munnar Rose Garden — sources and review limits',inLanguage:['ml-IN','en'],isPartOf:{'@id':'https://munnarrose.com/#website'}}];
+export const prerender=true;
+---
+<BaseLayout title="Munnar Rose Garden — Sources and review limits" description="Where the Munnar Rose Garden guide's facts come from and the limits of the review: KFDC listings, Kerala Tourism, Google Maps snapshots, and what remains unconfirmed." canonicalPath="/sources/">
+<Fragment slot="head">{schema.map(x=><script type="application/ld+json" is:inline set:html={JSON.stringify(x)}/>)}</Fragment>
+<section class="section"><div class="shell">
+<p class="crumbs"><a href="/">Munnar Rose Garden</a> <span class="crumb-sep">·</span> Sources</p>
+<h1>ഉറവിടങ്ങളും പരിശോധനയുടെ പരിധിയും <span lang="en">Sources and review limits</span></h1>
+<p>പരിശോധന {checked}; രേഖ പരിശോധിച്ചതുകൊണ്ട് സ്ഥലത്തെ പ്രവേശനസൗകര്യമോ ദിവസത്തെ പ്രവർത്തനമോ നേരിട്ട് പരിശോധിച്ചതായി കരുതരുത്.</p>
+<p lang="en">Reviewed {checked}. A document or Maps review is not an on-site accessibility or daily-operation inspection. Current admission, camera fees and daily hours remain unconfirmed.</p>
+<ul>
+<li><a href={sources.kfdc}>KFDC products / eco-shop locations</a> — Munnar Floriculture Centre / Rose Garden and published office contact.</li>
+<li><a href={sources.division}>KFDC division addresses</a> — Rose Garden, Maatupetty Road.</li>
+<li><a href={sources.tourism}>Kerala Tourism Responsible Tourism itinerary</a> — KFDC flower garden identity; visit slots are not opening hours.</li>
+<li><a href="https://www.keralatourism.org/homestays/rose-gardens/443">Kerala Tourism accommodation listing</a> — separate Rose Gardens Homestay; property-owner supplied listing, not garden facilities.</li>
+<li><a href={sources.maps}>Google Maps</a> — manual {checked} rating/address/closing/accessibility snapshot.</li>
+</ul>
+<p><a href="/">← മടങ്ങി / Home</a> · <a href="/image-credits/">Photo credits</a></p>
+</div></section>
+</BaseLayout>

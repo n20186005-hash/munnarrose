@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {sources, photos} from '../data/guide';
+const url='https://munnarrose.com/image-credits/';
+const schema=[{'@context':'https://schema.org','@type':'WebPage','@id':url+'#webpage',url,name:'Munnar Rose Garden — photo sources and licence',inLanguage:['ml-IN','en'],isPartOf:{'@id':'https://munnarrose.com/#website'}}];
+export const prerender=true;
+---
+<BaseLayout title="Munnar Rose Garden — Photo sources and licence" description="Image credits and CC BY-SA 4.0 licence for the historical 2017 Munnar Rose Garden photographs used on this guide, with author and source links." canonicalPath="/image-credits/">
+<Fragment slot="head">{schema.map(x=><script type="application/ld+json" is:inline set:html={JSON.stringify(x)}/>)}</Fragment>
+<section class="section"><div class="shell">
+<p class="crumbs"><a href="/">Munnar Rose Garden</a> <span class="crumb-sep">·</span> Photo credits</p>
+<h1>ചിത്രങ്ങളുടെ ഉറവിടവും ലൈസൻസും <span lang="en">Photo sources and licence</span></h1>
+<ul>
+<li>IM3847 · 2017-08-31 · <a href="https://commons.wikimedia.org/wiki/File:Flora_at_Munnar_Rose_Gardens_11.jpg">Flora at Munnar Rose Gardens 11.jpg</a> — flower-bed hero and social derivative.</li>
+{photos.map(p=><li>{p.author} · {p.date} · <a href={p.source}>{p.name}</a>.</li>)}
+</ul>
+<p>എല്ലാ ചിത്രങ്ങളും <a href={sources.license}>CC BY-SA 4.0</a>. യഥാർത്ഥ ഫയലുടെ ദിശ ശരിയാക്കി, വലിപ്പം കുറച്ച് JPEG ആയി കംപ്രസ് ചെയ്തു; സാമൂഹിക പങ്കിടൽ ചിത്രം മധ്യഭാഗം ക്രോപ്പ് ചെയ്തതാണ്. ദൃശ്യചട്ടം കൂടുതൽ ഭാഗം മറച്ചേക്കാം.</p>
+<p lang="en">All photographs are CC BY-SA 4.0. Derivatives were auto-oriented, resized and JPEG-compressed; the social cover is centre-cropped. Layout framing may crop further. Share-alike attribution and change notices apply to these derivatives. Credits do not imply endorsement or grant additional subject rights. The photos show historical flower displays/pond/flower detail, not a full current garden survey; no species identification as a rose is made for the close-up.</p>
+<p><a href="/">← മടങ്ങി / Home</a> · <a href="/sources/">Sources</a></p>
+</div></section>
+</BaseLayout>

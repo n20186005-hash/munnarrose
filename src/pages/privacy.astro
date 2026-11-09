@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const url='https://munnarrose.com/privacy/';
+const schema=[{'@context':'https://schema.org','@type':'WebPage','@id':url+'#webpage',url,name:'Munnar Rose Garden — privacy and services',inLanguage:['ml-IN','en'],isPartOf:{'@id':'https://munnarrose.com/#website'}}];
+export const prerender=true;
+---
+<BaseLayout title="Munnar Rose Garden — Privacy and services" description="Privacy note for the Munnar Rose Garden guide: Google Analytics, Cloudflare, weather requests to Open-Meteo, and what is not controlled on this site." canonicalPath="/privacy/">
+<Fragment slot="head">{schema.map(x=><script type="application/ld+json" is:inline set:html={JSON.stringify(x)}/>)}</Fragment>
+<section class="section"><div class="shell">
+<p class="crumbs"><a href="/">Munnar Rose Garden</a> <span class="crumb-sep">·</span> Privacy</p>
+<h1>സ്വകാര്യത <span lang="en">Privacy and services</span></h1>
+<p>Google Analytics ഈ പേജിൽ സ്വയം ലോഡ് ചെയ്യുന്നു; കുക്കികളും പേജ്/ബ്രൗസർ/ഉപകരണ ഉപയോഗവിവരങ്ങളും Google ലേക്ക് പോകാം. ഇവിടെ സമ്മതം നൽകാനോ അത് നിർത്താനോ പ്രത്യേക നിയന്ത്രണം നൽകിയിട്ടില്ല.</p>
+<p lang="en">Google Analytics retains its automatic loading. It may use cookies and send page, browser and device-usage information to Google; no site consent or disable control is offered. <a href="https://policies.google.com/privacy">Google privacy</a> · <a href="https://tools.google.com/dlpage/gaoptout">External browser opt-out tool</a>.</p>
+<p>2026-10-30 ന് പരിശോധിച്ച ഒരു ഉൽപ്പാദന HTML പ്രതികരണത്തിൽ Cloudflare beacon സ്ക്രിപ്റ്റ് കണ്ടില്ല. ഇതു സേവനം ഇല്ലെന്നോ മറ്റൊരു പ്രതികരണത്തിലോ പിന്നീട് ചേർക്കില്ലെന്നോ തെളിയിക്കുന്നില്ല. Cloudflare ഹോസ്റ്റിംഗിന്റെ ബന്ധം/സുരക്ഷാ ഡാറ്റ കൈകാര്യം ബ്രൗസർ സ്ക്രിപ്റ്റിൽനിന്ന് വേറെയാകാം.</p>
+<p lang="en">One production HTML response checked on 2026-10-30 did not show a Cloudflare beacon script. This does not establish absence in other responses or exclude later configuration changes. Cloudflare connection/security and edge-hosting processing can occur separately from a browser script.</p>
+<p>ഹോസ്റ്റിംഗ് ക്രമീകരണം സ്വതന്ത്ര Cloudflare Web Analytics ചേർക്കാം: സന്ദർശനം, പേജ് കാഴ്ച, URL പാത, referrer, ബ്രൗസർ/ഉപകരണം, പ്രവർത്തനക്ഷമത എന്നിവയുടെ മെട്രിക്കുകൾ. ഇവിടെ അതിനുള്ള സ്വിച്ച് ഇല്ല. സ്ക്രിപ്റ്റ് കാണുന്നതുമാത്രം പ്രവർത്തനമോ ഡാറ്റ അയക്കലോ തെളിയിക്കില്ല.</p>
+<p lang="en">Hosting may independently add Cloudflare Web Analytics measuring visits, page views, URL paths, referrers, browser/device information and performance; no site switch is provided for it. Script presence alone would not prove execution or transmission. <a href="https://developers.cloudflare.com/web-analytics/data-metrics/">Cloudflare documentation</a>.</p>
+<p>കാലാവസ്ഥയ്ക്കായി ബ്രൗസർ ഈ സൈറ്റിലെ endpoint നെ ബന്ധപ്പെടുന്നു; സൈറ്റിന്റെ സർവർ സ്ഥിരമായ പ്രാദേശിക ബിന്ദുവിന് Open-Meteo യിൽനിന്ന് ഡാറ്റ എടുക്കുന്നു. ഉപകരണത്തിന്റെ സ്ഥലം ചോദിക്കുന്നില്ല. ചിത്രങ്ങൾ ഇവിടെനിന്ന് നൽകുന്നു; Maps എംബെഡ് ചെയ്തിട്ടില്ല. പുറംലിങ്കുകൾക്ക് അതത് സേവനത്തിന്റെ നയം ബാധകമാണ്.</p>
+<p lang="en">Weather is requested from this site; its server contacts Open-Meteo for a fixed regional point, sharing server connection information rather than a direct visitor-browser request. Device location is not requested. Photos are local, Maps is linked rather than embedded, and external links use their providers’ policies. <a href="https://open-meteo.com/en/terms">Open-Meteo terms</a>.</p>
+<p><a href="/">← മടങ്ങി / Home</a> · <a href="/terms/">Terms</a></p>
+</div></section>
+</BaseLayout>

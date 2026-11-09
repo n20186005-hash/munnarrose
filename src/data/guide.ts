@@ -1,5 +1,9 @@
 export const checked='2026-10-30';
 export const sources={kfdc:'https://kfdc.kerala.gov.in/?page_id=1046',division:'https://kfdc.kerala.gov.in/?page_id=1586',tourism:'https://www.keralatourism.org/responsible-tourism/packages/details/munnar-hills/24',maps:'https://maps.app.goo.gl/caVTicvucY2XJR2x6',license:'https://creativecommons.org/licenses/by-sa/4.0/'};
+export const photos=[
+ {src:'/images/pond-2017-900.jpg',alt:'2017 ലെ ചെറിയ ജലസസ്യക്കുളവും ചുറ്റുമുള്ള ഇലകളും / Historical Munnar Rose Gardens pond and foliage, IM3847',name:'Flora at Munnar Rose Gardens 12.jpg',author:'IM3847',date:'2017-08-31',source:'https://commons.wikimedia.org/wiki/File:Flora_at_Munnar_Rose_Gardens_12.jpg',height:675},
+ {src:'/images/flower-2017-900.jpg',alt:'2017 ലെ പിങ്ക്-വെള്ള നിറത്തിലുള്ള പല ഇതളുകളുള്ള പൂവ്; റോസ് എന്ന് തിരിച്ചറിഞ്ഞിട്ടില്ല / Historical pink-white flower detail, species not identified as a rose',name:'A flower in the Rose garden in Munnar 01.jpg',author:'Soumendra Kumar Sahoo',date:'2017-04-29',source:'https://commons.wikimedia.org/wiki/File:A_flower_in_the_Rose_garden_in_Munnar_01.jpg',height:1200}
+];
 export const sections=[
 {id:'identity',ml:'ഏത് റോസ് ഗാർഡൻ?',en:'Which Rose Garden?',paragraphs:[
 {ml:'KFDC യുടെ ഔദ്യോഗിക പട്ടികയിൽ മൂന്നാർ മാട്ടുപ്പെട്ടി റോഡിലെ Floriculture Centre, Rose Garden എന്നാണ് സ്ഥലം രേഖപ്പെടുത്തിയിരിക്കുന്നത്. കേരള ടൂറിസത്തിന്റെ Responsible Tourism യാത്രാപദ്ധതി KFDC flower garden നെ Munnar Rose Garden എന്നും വിളിക്കുന്നു.',en:'KFDC lists a Floriculture Centre, Rose Garden on Maatupetty Road, Munnar. Kerala Tourism’s Responsible Tourism itinerary also identifies the KFDC flower garden as Munnar Rose Garden.'},

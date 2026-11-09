@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const url='https://munnarrose.com/terms/';
+const schema=[{'@context':'https://schema.org','@type':'WebPage','@id':url+'#webpage',url,name:'Munnar Rose Garden — use and limitations',inLanguage:['ml-IN','en'],isPartOf:{'@id':'https://munnarrose.com/#website'}}];
+export const prerender=true;
+---
+<BaseLayout title="Munnar Rose Garden — Use and limitations" description="How to use the Munnar Rose Garden guide: it is an independent visitor-information guide that does not sell tickets or rooms, and current facts must be confirmed with the operator." canonicalPath="/terms/">
+<Fragment slot="head">{schema.map(x=><script type="application/ld+json" is:inline set:html={JSON.stringify(x)}/>)}</Fragment>
+<section class="section"><div class="shell">
+<p class="crumbs"><a href="/">Munnar Rose Garden</a> <span class="crumb-sep">·</span> Terms</p>
+<h1>ഉപയോഗ നിബന്ധനകൾ <span lang="en">Use and limitations</span></h1>
+<p>ഈ ഗൈഡ് ടിക്കറ്റ്, മുറി ബുക്കിംഗ്, അക്കൗണ്ട് സേവനം നൽകുന്നില്ല. സമയം, നിരക്ക്, വഴി, സൗകര്യം, കാലാവസ്ഥ എന്നിവ നിലവിലെ ബന്ധപ്പെട്ട ഉറവിടത്തിൽ സ്ഥിരീകരിക്കുക. ചിത്രങ്ങൾ ഇന്നത്തെ അവസ്ഥയുടെ തെളിവല്ല.</p>
+<p lang="en">This independent guide does not provide ticket, accommodation-booking or account services. Confirm current opening, charges, routes and required facilities with the relevant source. A forecast is not an access or safety clearance, and historical photographs are not current-condition evidence.</p>
+<p><a href="/">← മടങ്ങി / Home</a> · <a href="/privacy/">Privacy</a></p>
+</div></section>
+</BaseLayout>
