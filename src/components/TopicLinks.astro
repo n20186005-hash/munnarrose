@@ -1,0 +1,28 @@
+---
+import { GROUPS, GROUP_ORDER, TOPICS } from '../data/topics';
+
+const cards = GROUP_ORDER.map((id) => ({
+  id,
+  ...GROUPS[id],
+  topics: TOPICS.filter((t) => t.group === id).slice(0, 4),
+}));
+---
+<section id="guides" class="section">
+  <div class="shell">
+    <h2>സന്ദർശക ഗൈഡുകൾ <span lang="en">Visitor guides for Munnar Rose Garden</span></h2>
+    <p lang="en">Separate, printable answers for the questions travellers ask most: hours, entry charges, directions, flowers, nearby Mattupetty stops, routes, food and stays. Each guide states what is verified and what must be confirmed with KFDC.</p>
+    <div class="guide-grid guide-grid-groups">
+      {cards.map((g) => (
+        <div class="card guide-group">
+          <h3><a href={g.hub}>{g.label}</a></h3>
+          <p class="small">{g.blurb}</p>
+          <ul>
+            {g.topics.map((t) => <li><a href={t.path}>{t.h1}</a></li>)}
+          </ul>
+          <p><a class="small" href={g.hub}>More in this section →</a></p>
+        </div>
+      ))}
+    </div>
+    <p><a class="button" href="/guides/">Browse all visitor guides</a></p>
+  </div>
+</section>

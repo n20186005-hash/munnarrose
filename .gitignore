@@ -23,3 +23,12 @@ yarn-error.log*
 # misc
 .DS_Store
 *.pem
+
+# local validation build output & sandbox artifacts
+dist-static/
+.wrangler-out/
+*.log
+lang-report*.txt
+content-report.txt
+ml-ctx.txt
+astro.config.static.mjs

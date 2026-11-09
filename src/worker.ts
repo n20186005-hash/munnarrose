@@ -9,6 +9,9 @@ export default {
   if(canonicalHost&&(url.protocol==='http:'||url.hostname==='www.'+APEX_HOST)){
    url.protocol='https:';url.hostname=APEX_HOST;return Response.redirect(url.toString(),301);
   }
+  if(url.pathname!=='/'&&!url.pathname.endsWith('/')&&!/\.[a-z0-9]+$/i.test(url.pathname)){
+   url.pathname+='/';return Response.redirect(url.toString(),301);
+  }
   const response=await astroHandler.fetch(request,env,ctx);
   const headers=new Headers(response.headers);
   headers.set('X-Content-Type-Options','nosniff');headers.set('Referrer-Policy','strict-origin-when-cross-origin');

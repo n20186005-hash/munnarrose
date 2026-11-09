@@ -9,6 +9,8 @@ const SITE_URL = 'https://munnarrose.com';
 export default defineConfig({
   site: SITE_URL || undefined,
   output: 'server',
+  trailingSlash: 'always',
+  build: { format: 'directory' },
   adapter: cloudflare({ configPath: 'wrangler.jsonc' }),
   integrations: SITE_URL ? [sitemap({customPages:['https://munnarrose.com/'],filter:url=>!/(?:404|api|offline)(?:\/|\.html|$)/.test(url)})] : [],
   vite: {

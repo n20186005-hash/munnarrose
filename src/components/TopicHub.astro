@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { GROUPS, GROUP_ORDER, TOPICS, type GroupId } from '../data/topics';
+
+interface Props { group?: GroupId }
+const { group } = Astro.props;
+
+const base = 'https://munnarrose.com';
+const groups = group ? [group] : GROUP_ORDER;
+const path = group ? GROUPS[group].hub : '/guides/';
+const title = group
+  ? `${GROUPS[group].label} guides | Munnar Rose Garden`
+  : 'Munnar Rose Garden visitor guides: hours, fees, routes and nearby places';
+const description = group
+  ? GROUPS[group].blurb
+  : 'Independent English visitor guides to Munnar Rose Garden and the KFDC Floriculture Centre: timings and entry checks, flowers, Mattupetty nearby places, transport, itineraries, food and stays.';
+const h1 = group ? `${GROUPS[group].label} guides` : 'Munnar Rose Garden visitor guides';
+
+const crumbs = [
+  { name: 'Munnar Rose Garden', url: base + '/' },
+  { name: 'Visitor guides', url: base + '/guides/' },
+];
+if (group) crumbs.push({ name: GROUPS[group].label, url: base + path });
+
+const schema = [
+  {
+    '@context': 'https://schema.org', '@type': 'CollectionPage', '@id': base + path + '#webpage',
+    url: base + path, name: title, description, inLanguage: 'en',
+    about: { '@id': base + '/#attraction' }, isPartOf: { '@id': base + '/#website' },
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.url })),
+  },
+];
+---
+<BaseLayout title={title} description={description} lang="en" canonicalPath={path}>
+  <Fragment slot="head">{schema.map((x) => <script type="application/ld+json" is:inline set:html={JSON.stringify(x)}/>)}</Fragment>
+
+  <section class="section hero topic-hero">
+    <div class="shell">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        {crumbs.map((c, i) => <span>{i > 0 && <span class="crumb-sep"> › </span>}{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</span>)}
+      </nav>
+      <p class="kicker">Munnar · Kerala · India</p>
+      <h1>{h1}</h1>
+      <p class="lead">{description}</p>
+      <p><a class="button" href="/">Home guide</a> <a class="button secondary" href="/guides/">All guides</a></p>
+    </div>
+  </section>
+
+  {groups.map((id) => (
+    <section class="section">
+      <div class="shell">
+        <h2>{GROUPS[id].label}</h2>
+        <p>{GROUPS[id].blurb}</p>
+        <div class="guide-grid">
+          {TOPICS.filter((t) => t.group === id).map((t) => (
+            <a class="card guide-card" href={t.path}><strong>{t.h1}</strong><span>{t.description}</span></a>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section">
+    <div class="shell">
+      <h2>Other guide sections</h2>
+      <div class="guide-grid">
+        {GROUP_ORDER.filter((id) => id !== group).map((id) => (
+          <a class="card guide-card" href={GROUPS[id].hub}><strong>{GROUPS[id].label}</strong><span>{GROUPS[id].blurb}</span></a>
+        ))}
+      </div>
+      <p class="topic-note">These are independent, unofficial, nonprofit information pages. Current hours, charges, facilities and plant displays are not verified by this guide; confirm them with KFDC or current on-site notices before travelling.</p>
+      <p><a href="/">← Munnar Rose Garden home</a></p>
+    </div>
+  </section>
+</BaseLayout>

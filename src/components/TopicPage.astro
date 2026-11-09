@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { GROUPS, checked, sources, relatedTopics, type Topic } from '../data/topics';
+
+interface Props { topic: Topic }
+const { topic } = Astro.props;
+
+const base = 'https://munnarrose.com';
+const pageUrl = base + topic.path;
+const group = GROUPS[topic.group];
+
+const crumbs: { name: string; url: string }[] = [
+  { name: 'Munnar Rose Garden', url: base + '/' },
+  { name: 'Visitor guides', url: base + '/guides/' },
+];
+if (group.hub !== '/guides/') crumbs.push({ name: group.label, url: base + group.hub });
+crumbs.push({ name: topic.h1, url: pageUrl });
+
+const schema = [
+  {
+    '@context': 'https://schema.org', '@type': 'WebPage', '@id': pageUrl + '#webpage',
+    url: pageUrl, name: topic.title, description: topic.description, inLanguage: 'en',
+    about: { '@id': base + '/#attraction' }, isPartOf: { '@id': base + '/#website' },
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList', '@id': pageUrl + '#breadcrumb',
+    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.url })),
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'FAQPage', '@id': pageUrl + '#faq',
+    mainEntity: topic.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+];
+
+const photos = {
+  flowerbed: {
+    src: '/images/flowerbed-2017-1600.jpg', width: 1600, height: 1200,
+    alt: 'Historical 2017 photograph of pink flower beds and hanging pots at Munnar Rose Gardens (IM3847); not a view of present conditions',
+    credit: 'IM3847 · 2017-08-31 · CC BY-SA 4.0',
+  },
+  flower: {
+    src: '/images/flower-2017-900.jpg', width: 900, height: 1200,
+    alt: 'Historical 2017 close-up of a pink-white flower at Munnar Rose Gardens; species not identified as a rose',
+    credit: 'Soumendra Kumar Sahoo · 2017-04-29 · CC BY-SA 4.0',
+  },
+  pond: {
+    src: '/images/pond-2017-900.jpg', width: 900, height: 675,
+    alt: 'Historical 2017 photograph of a small pond and surrounding foliage at Munnar Rose Gardens (IM3847)',
+    credit: 'IM3847 · 2017-08-31 · CC BY-SA 4.0',
+  },
+} as const;
+
+const photo = topic.photo ? photos[topic.photo] : undefined;
+const related = relatedTopics(topic);
+const sectionViews = topic.sections.map((s) => ({ heading: s.heading, paragraphs: s.paragraphs, bullets: s.bullets ?? [] }));
+---
+<BaseLayout title={topic.title} description={topic.description} lang="en" canonicalPath={topic.path}>
+  <Fragment slot="head">{schema.map((x) => <script type="application/ld+json" is:inline set:html={JSON.stringify(x)}/>)}</Fragment>
+
+  <section class="section hero topic-hero">
+    <div class="shell">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        {crumbs.map((c, i) => <span>{i > 0 && <span class="crumb-sep"> › </span>}{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</span>)}
+      </nav>
+      <p class="kicker">{group.label} · Munnar, Kerala</p>
+      <h1>{topic.h1}</h1>
+      <p class="lead">{topic.lead}</p>
+      <p><a class="button" href="/guides/">All visitor guides</a> <a class="button secondary" href={sources.maps} target="_blank" rel="noopener noreferrer">Google Maps reference ↗</a></p>
+      <dl class="topic-facts">
+        {topic.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+      </dl>
+    </div>
+  </section>
+
+  {sectionViews.map((s) => (
+    <section class="section">
+      <div class="shell">
+        <h2>{s.heading}</h2>
+        {s.paragraphs.map((p) => <p>{p}</p>)}
+        <ul class="topic-bullets">{s.bullets.map((b) => <li>{b}</li>)}</ul>
+      </div>
+    </section>
+  ))}
+
+  {photo && (
+    <section class="section">
+      <div class="shell">
+        <h2>Historical photograph</h2>
+        <figure class="topic-photo">
+          <img src={photo.src} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy"/>
+          <figcaption>{photo.credit} · Historical 2017 photograph; it does not confirm today's blooms, paths or facilities. <a href="/#image-credits">Full image credits and licence ↗</a></figcaption>
+        </figure>
+      </div>
+    </section>
+  )}
+
+  <section class="section">
+    <div class="shell">
+      <h2>Frequently asked questions</h2>
+      {topic.faqs.map((f) => <details class="card"><summary>{f.q}</summary><p>{f.a}</p></details>)}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <h2>Related guides</h2>
+      <div class="guide-grid">
+        {related.map((r) => <a class="card guide-card" href={r.path}><strong>{r.h1}</strong><span>{r.description}</span></a>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <h2>Sources and verification limits</h2>
+      <p>Fact review date: {checked}. No new on-site inspection was carried out for this guide. Current opening hours, admission and camera charges, parking, toilets, accessible routes and the present plant collection remain unconfirmed; verify them with KFDC or the current on-site notice.</p>
+      <ul>
+        <li><a href={sources.kfdc}>KFDC products and eco-shop locations</a> — Munnar Floriculture Centre / Rose Garden listing.</li>
+        <li><a href={sources.division}>KFDC Munnar Division addresses</a> — Rose Garden, Maatupetty Road.</li>
+        <li><a href={sources.tourism}>Kerala Tourism Responsible Tourism itinerary</a> — garden identity and separate Mattupetty stops; itinerary slots are not opening hours.</li>
+        <li><a href={sources.maps}>Google Maps</a> — dated {checked} address, plus code and rating snapshot.</li>
+      </ul>
+      <p class="topic-note">Munnar Rose Garden is an independent, unofficial, nonprofit visitor-information guide. It is not operated by KFDC or Kerala Tourism, does not sell tickets or accommodation, and does not publish Google Maps ratings as its own collected reviews. The 4.3 / 5 · 10,727 figure shown on the home page is a manual {checked} snapshot and is not included in structured data.</p>
+      <p><a href="/">← Munnar Rose Garden home</a> · <a href="/guides/">Visitor guides</a></p>
+    </div>
+  </section>
+</BaseLayout>
